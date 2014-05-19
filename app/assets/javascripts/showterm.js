@@ -70,7 +70,7 @@ $(function () {
         position += 1;
 
         if (position + 1 === timings.length) {
-            addToTerminal("exit");
+            addToTerminal("\r\n\r\nFIN.");
             stopped = true;
         } else {
             window.setTimeout(tick, timings[position + 1][0] * delay);
