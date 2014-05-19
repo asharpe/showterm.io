@@ -22,6 +22,10 @@ $(function () {
         delay /= 2;
     }
 
+    function normal() {
+        delay = 1000;
+    }
+
     function addToTerminal(string) {
         terminal.write(string);
     }
@@ -63,14 +67,15 @@ $(function () {
         addToTerminal(script.substr(start, timings[position][1]));
         start += timings[position][1];
         $(".controls .slider").slider("value", position);
+        position += 1;
 
         if (position + 1 === timings.length) {
+            addToTerminal("exit");
             stopped = true;
         } else {
             window.setTimeout(tick, timings[position + 1][0] * delay);
         }
 
-        position += 1;
     }
 
     $('.controls .slider').slider({
@@ -100,6 +105,7 @@ $(function () {
                 // resume
                 if (!paused) tick();
                 break;
+            case "normal": normal(); break;
             case "slower": slower(); break;
             case "faster": faster(); break;
             case "replay":
