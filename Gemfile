@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.0.0'
+ruby '2.1.1'
 
 gem 'rails'
 gem 'heroku'
@@ -12,7 +12,7 @@ gem 'skylight'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'pg'
+gem 'sqlite3'
 
 # Gems used only for assets and not required
 # in production environments by default.
