@@ -93,17 +93,24 @@ $(function () {
             case "play":
                 paused = !paused;
 
-                // unpausing after moving the slider
-                window.location.hash = '';
-                if (position) {
-                    start = 0;
-                    timings.slice(0, position).forEach(function (timing) {
-                        start += timing[1];
-                    });
-                }
 
                 // resume
-                if (!paused) tick();
+                if (!paused) {
+                    // unpausing after moving the slider
+                    window.location.hash = '';
+                    if (position) {
+                        start = 0;
+                        timings.slice(0, position).forEach(function (timing) {
+                            start += timing[1];
+                        });
+                    }
+
+                    tick();
+                }
+                else {
+                    window.location.hash = position;
+                }
+
                 break;
             case "normal": normal(); break;
             case "slower": slower(); break;
