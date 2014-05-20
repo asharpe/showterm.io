@@ -1,6 +1,13 @@
 /*global window,document,console, $,Terminal */
 /*jslint regexp: false*/
 $(function () {
+    var init = window.location.hash && window.location.hash.substr(1);
+    // a plain number is to start a particular frame,
+    // a semicolon followed by a number is a multiplier for
+    // the initial delay
+    mult = (tmp = init.split(';')).length > 1 ? Number(tmp[1]) || 1 : 1;
+    if (mult !== 1) window.location.hash = tmp[0];
+
     Terminal.bindKeys = function () {};
     var timings = window.timingfile.trim().split("\n").map(function (line) {
         return line.split(" ").map(Number);
@@ -12,7 +19,7 @@ $(function () {
         stopped = false,
         paused = false,
         terminal,
-        delay = 1000;
+        delay = mult * 1000;
 
     function slower() {
         delay *= 2;
