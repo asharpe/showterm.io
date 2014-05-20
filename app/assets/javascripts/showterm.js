@@ -77,7 +77,7 @@ $(function () {
         position += 1;
 
         if (position + 1 === timings.length) {
-            addToTerminal("exit");
+            addToTerminal("\r\n\r\nFIN.");
             stopped = true;
         } else {
             window.setTimeout(tick, timings[position + 1][0] * delay);
@@ -100,17 +100,24 @@ $(function () {
             case "play":
                 paused = !paused;
 
-                // unpausing after moving the slider
-                window.location.hash = '';
-                if (position) {
-                    start = 0;
-                    timings.slice(0, position).forEach(function (timing) {
-                        start += timing[1];
-                    });
-                }
 
                 // resume
-                if (!paused) tick();
+                if (!paused) {
+                    // unpausing after moving the slider
+                    window.location.hash = '';
+                    if (position) {
+                        start = 0;
+                        timings.slice(0, position).forEach(function (timing) {
+                            start += timing[1];
+                        });
+                    }
+
+                    tick();
+                }
+                else {
+                    window.location.hash = position;
+                }
+
                 break;
             case "normal": normal(); break;
             case "slower": slower(); break;
