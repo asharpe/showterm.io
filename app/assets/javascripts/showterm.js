@@ -3,10 +3,25 @@
 $(function () {
     var init = window.location.hash && window.location.hash.substr(1);
     // a plain number is to start a particular frame,
-    // a semicolon followed by a number is a multiplier for
-    // the initial delay
-    mult = (tmp = init.split(';')).length > 1 ? Number(tmp[1]) || 1 : 1;
-    if (mult !== 1) window.location.hash = tmp[0];
+    // a semicolon followed by name=value pairs for any of 
+    // speed
+    // paused
+    // width
+    // height
+    var options = {};
+    if (init) {
+        var hash='';
+        init.split(';').forEach(function(o) {
+            var t = o.split('=');
+            if (t.length == 1) {
+                hash = t;
+                return;
+            }
+            options[t[0]] = t[1];
+        });
+
+        window.location.hash = hash;
+    }
 
     Terminal.bindKeys = function () {};
     var timings = window.timingfile.trim().split("\n").map(function (line) {
@@ -19,7 +34,7 @@ $(function () {
         stopped = false,
         paused = false,
         terminal,
-        delay = mult * 1000;
+        delay = (Number(options.delay) || 1) * 1000;
 
     function slower() {
         delay *= 2;
@@ -42,7 +57,7 @@ $(function () {
             $(terminal.element).remove();
         }
 
-        terminal = new Terminal(window.columns, window.lines || Math.floor(window.innerHeight / 15));
+        terminal = new Terminal(options.columns || window.columns, options.lines || window.lines || Math.floor(window.innerHeight / 15));
         terminal.refresh();
         terminal.open();
         Terminal.focus = null;
@@ -124,6 +139,7 @@ $(function () {
             case "faster": faster(); break;
             case "replay":
                 paused = false;
+                window.location.hash = '';
                 reset();
                 tick();
                 break;
