@@ -32,7 +32,7 @@ class ScriptsController < ApplicationController
     if request.base_url == "https://showterm.herokuapp.com"
       "http://showterm.io"
     else
-      request.base_url
+      request.env['REQUEST_URI'].rpartition(request.env['PATH_INFO'])[0]
     end
   end
 
