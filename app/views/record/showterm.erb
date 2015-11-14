@@ -34,8 +34,7 @@ fi
 if [ "-d" = "$1" -o "--delete" = "$1" ]
 then
     url="${2?-Usage showterm --delete <url>}"
-    curl --fail "$url" -X "DELETE" --data-urlencode "secret@$HOME/.showterm"
-    exit
+    exec curl --fail "$url" -X "DELETE" --data-urlencode "secret@$HOME/.showterm"
 fi
 
 scriptfile="$(mktemp /tmp/XXXXX.script)"
@@ -59,15 +58,18 @@ then
 fi
 
 echo "showterm recording. (Exit shell when done.)"
-script $args -q -t"$timingfile" "$scriptfile"
+script $args -q -t "$scriptfile" 2>"$timingfile"
 echo "Uploading..."
 
-if curl --fail "$url" --data-urlencode "cols=$cols" --data-urlencode "lines=$lines" --data-urlencode "scriptfile@$scriptfile" --data-urlencode "timingfile@$timingfile" "secret@$HOME/.showterm"
+if curl --fail "$url" --data-urlencode "cols=$cols" --data-urlencode "lines=$lines" --data-urlencode "scriptfile@$scriptfile" --data-urlencode "timingfile@$timingfile" --data-urlencode "secret@$HOME/.showterm"
 then
     echo ""
     rm "$scriptfile" "$timingfile"
     exit 0
 else
-    echo "Uploading failed, but don't worry! Your work is safe. You can try uploading again with:"
-    echo curl "$url" --data-urlencode "cols=$cols" --data-urlencode "lines=$lines" --data-urlencode "scriptfile@$scriptfile" --data-urlencode "timingfile@$timingfile" "secret@$HOME/.showterm"
+    result=$?
+    echo "Uploading failed. You can try uploading again with:"
+    echo curl "$url" --data-urlencode "cols=$cols" --data-urlencode "lines=$lines" --data-urlencode "scriptfile@$scriptfile" --data-urlencode "timingfile@$timingfile" --data-urlencode "secret@$HOME/.showterm"
+    exit $result
 fi
+

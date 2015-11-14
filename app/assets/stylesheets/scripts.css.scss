@@ -46,6 +46,10 @@ a {
 
     a {
       height: 13px;
+      &.ui-slider-handle {
+        width: .5em;
+        margin-left: -0.1em;
+      }
     }
   }
   .logo-link {

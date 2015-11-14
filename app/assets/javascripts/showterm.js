@@ -1,6 +1,28 @@
 /*global window,document,console, $,Terminal */
 /*jslint regexp: false*/
 $(function () {
+    var init = window.location.hash && window.location.hash.substr(1);
+    // a plain number is to start a particular frame,
+    // a semicolon followed by name=value pairs for any of 
+    // speed
+    // paused
+    // width
+    // height
+    var options = {};
+    if (init) {
+        var hash='';
+        init.split(';').forEach(function(o) {
+            var t = o.split('=');
+            if (t.length == 1) {
+                hash = t;
+                return;
+            }
+            options[t[0]] = t[1];
+        });
+
+        window.location.hash = hash;
+    }
+
     Terminal.bindKeys = function () {};
     var timings = window.timingfile.trim().split("\n").map(function (line) {
         return line.split(" ").map(Number);
@@ -12,7 +34,7 @@ $(function () {
         stopped = false,
         paused = false,
         terminal,
-        delay = 1000;
+        delay = (Number(options.delay) || 1) * 1000;
 
     function slower() {
         delay *= 2;
@@ -20,6 +42,10 @@ $(function () {
 
     function faster() {
         delay /= 2;
+    }
+
+    function normal() {
+        delay = 1000;
     }
 
     function addToTerminal(string) {
@@ -31,7 +57,7 @@ $(function () {
             $(terminal.element).remove();
         }
 
-        terminal = new Terminal(window.columns, window.lines || Math.floor(window.innerHeight / 15));
+        terminal = new Terminal(options.columns || window.columns, options.lines || window.lines || Math.floor(window.innerHeight / 15));
         terminal.refresh();
         terminal.open();
         Terminal.focus = null;
@@ -63,14 +89,15 @@ $(function () {
         addToTerminal(script.substr(start, timings[position][1]));
         start += timings[position][1];
         $(".controls .slider").slider("value", position);
+        position += 1;
 
         if (position + 1 === timings.length) {
+            addToTerminal("\r\n\r\nFIN.");
             stopped = true;
         } else {
             window.setTimeout(tick, timings[position + 1][0] * delay);
         }
 
-        position += 1;
     }
 
     $('.controls .slider').slider({
@@ -88,22 +115,31 @@ $(function () {
             case "play":
                 paused = !paused;
 
-                // unpausing after moving the slider
-                window.location.hash = '';
-                if (position) {
-                    start = 0;
-                    timings.slice(0, position).forEach(function (timing) {
-                        start += timing[1];
-                    });
-                }
 
                 // resume
-                if (!paused) tick();
+                if (!paused) {
+                    // unpausing after moving the slider
+                    window.location.hash = '';
+                    if (position) {
+                        start = 0;
+                        timings.slice(0, position).forEach(function (timing) {
+                            start += timing[1];
+                        });
+                    }
+
+                    tick();
+                }
+                else {
+                    window.location.hash = position;
+                }
+
                 break;
+            case "normal": normal(); break;
             case "slower": slower(); break;
             case "faster": faster(); break;
             case "replay":
                 paused = false;
+                window.location.hash = '';
                 reset();
                 tick();
                 break;
